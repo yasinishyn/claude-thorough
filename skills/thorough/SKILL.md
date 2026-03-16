@@ -72,48 +72,44 @@ If **any axis is unclear** → Phase 2.
 
 ## Phase 2 — Interrogation (Interactive)
 
-**MANDATORY: You MUST call the `AskUserQuestion` tool for ALL interrogation questions. NEVER write questions as plain text output. If you catch yourself typing questions as text, STOP and use the tool instead.**
+### Step-by-step procedure (follow EXACTLY)
 
-The AskUserQuestion tool presents interactive multiple-choice UI that users can click to answer. This is the ONLY acceptable way to ask questions in this phase.
+1. Output ONE sentence: "I need to clarify a few things before building this."
+2. **IMMEDIATELY call the `AskUserQuestion` tool** — do NOT output any questions as text. The tool renders an interactive UI with clickable options.
+3. Wait for the user's selections.
+4. Re-triage all 6 axes. If gaps remain, go back to step 1 with the next batch.
+5. Repeat until all axes are clear.
 
-### Tool constraints
+**CRITICAL: Between step 1 and step 2, do NOT output any text that contains question marks. If your output contains "?" you are doing it wrong. All questions go through the tool.**
 
-- **1-4 questions per tool call**, each with **2-4 options**
-- Users can always select "Other" for free-text input (built into the tool automatically)
-- Use multiple rounds (multiple tool calls) if there are more than 4 unclear axes
-- Set `multiSelect: true` when choices are not mutually exclusive
+### AskUserQuestion tool format
 
-### Before calling the tool
+- 1-4 questions per call, each with 2-4 options
+- Users automatically get an "Other" option for free-text input
+- Use `multiSelect: true` when choices are not mutually exclusive
+- Put the recommended option first with "(Recommended)" in the label
+- Keep `header` short (max 12 chars): "Stack", "Auth", "DB", "Scope", "Delivery", "Format", "Users", "Output"
+- Each option `description` should explain implementation implications
 
-Output a brief 1-2 sentence context line explaining what's still unclear and why it matters. Then IMMEDIATELY call AskUserQuestion. Do not list questions as text.
+### Prioritization
 
-### How to structure questions
-
-1. **Prioritize**: Pick the 4 most impactful unclear axes for this round. Start with questions whose answers inform subsequent questions.
-2. **Design options**: Provide 2-4 concrete options representing the most likely answers. Put the recommended option first with "(Recommended)" in the label.
-3. **Write descriptions**: Each option's description should explain implementation implications — tradeoffs, what changes.
-4. **Use short headers** (max 12 chars): "Stack", "Auth", "Database", "Scope", "Delivery", "Format", "Users", "Output", etc.
-
-### After each round
-
-Re-triage all 6 axes. If new gaps emerged, call AskUserQuestion again for the next round. Continue until every axis is unambiguously clear.
+Pick the 4 most impactful unclear axes per round. Start with questions whose answers inform subsequent questions (e.g., ask about scope before asking about auth).
 
 ### Rules
 
-- **NEVER output questions as plain text.** Always use the AskUserQuestion tool.
 - Never re-ask a question the user already answered.
-- Flag contradictions immediately: quote both conflicting statements and use AskUserQuestion to ask which one holds.
-- No cap on number of rounds. Stay in this phase until every axis is unambiguous.
-- Do NOT offer to "just start" and refine later — that's how you get 400-line rewrites.
+- Flag contradictions: quote both conflicting statements and use AskUserQuestion to resolve.
+- No cap on number of rounds.
+- Do NOT offer to "just start" and refine later.
 
-### Anti-pattern enforcement
+### Anti-patterns (NEVER do these)
 
-- Do NOT write questions as text output — this is the #1 anti-pattern for this phase. USE THE TOOL.
-- Do NOT write code "to show what I mean" — use words.
-- Do NOT treat user confidence as a substitute for clarity ("I know what I want" does not resolve the Behavior axis).
-- Do NOT interpret silence on error handling as "errors don't matter."
-- Do NOT treat a half-answered question as resolved.
-- Do NOT assume to simplify the scope. Under-scoping is just as dangerous as over-scoping — delivering less than what's needed wastes just as much time as delivering more.
+- Writing questions as text with "?" in your output — USE THE TOOL
+- Writing code "to show what I mean"
+- Treating user confidence as a substitute for clarity
+- Interpreting silence on error handling as "errors don't matter"
+- Treating a half-answered question as resolved
+- Assuming to simplify scope without agreement
 
 ---
 
