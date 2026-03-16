@@ -8,7 +8,7 @@ Questions are presented as **interactive multiple-choice selections** — no wal
 
 Claude is eager to help. Sometimes too eager. Given a vague prompt like "build me an API," it will pick a framework, invent a schema, guess at auth, and hand you 200 lines of code built on assumptions you never agreed to.
 
-`thorough` fixes this with two skills that separate **planning** from **coding**:
+`thorough` fixes this with two commands that separate **planning** from **coding**:
 
 - **`/thorough:plan`** — Deep requirements gathering across 12 axes: user roles, user stories, user flows, data model, UI/UX, inputs, outputs, behavior, scope, constraints, integrations, and success criteria. Produces a structured requirements document.
 - **`/thorough:code`** — TDD implementation of the approved plan. Strict Red-Green methodology: failing tests first, then minimal code.
@@ -46,13 +46,6 @@ After the plan is approved:
 3. Verifies against success criteria from the plan
 4. Stops and asks if anything becomes unclear mid-implementation
 
-### `/thorough:ask` — Standalone interactive questions
-
-Use directly to gather preferences on specific topics:
-```
-/thorough:ask stack, database, auth method, deployment
-```
-
 ## Install
 
 ### Prerequisites
@@ -71,22 +64,20 @@ Use directly to gather preferences on specific topics:
 
 ```bash
 git clone https://github.com/yasinishyn/claude-thorough.git /tmp/thorough
-mkdir -p ~/.claude/skills/plan ~/.claude/skills/code ~/.claude/skills/ask
+mkdir -p ~/.claude/skills/plan ~/.claude/skills/code
 cp /tmp/thorough/skills/plan/SKILL.md ~/.claude/skills/plan/SKILL.md
 cp /tmp/thorough/skills/code/SKILL.md ~/.claude/skills/code/SKILL.md
-cp /tmp/thorough/skills/ask/SKILL.md ~/.claude/skills/ask/SKILL.md
 ```
 
-With this method skills are invoked as `/plan`, `/code`, `/ask` (no namespace prefix).
+With this method skills are invoked as `/plan` and `/code` (no namespace prefix).
 
 ### Option C — Project install (shared with collaborators via git)
 
 ```bash
 git clone https://github.com/yasinishyn/claude-thorough.git /tmp/thorough
-mkdir -p .claude/skills/plan .claude/skills/code .claude/skills/ask
+mkdir -p .claude/skills/plan .claude/skills/code
 cp /tmp/thorough/skills/plan/SKILL.md .claude/skills/plan/SKILL.md
 cp /tmp/thorough/skills/code/SKILL.md .claude/skills/code/SKILL.md
-cp /tmp/thorough/skills/ask/SKILL.md .claude/skills/ask/SKILL.md
 git add .claude/skills/
 git commit -m "Add thorough skills"
 ```
@@ -160,7 +151,7 @@ claude-thorough/
 │   ├── code/
 │   │   └── SKILL.md         # TDD implementation
 │   └── ask/
-│       └── SKILL.md         # Standalone interactive questioning
+│       └── SKILL.md         # Internal: interactive questioning tool
 ├── README.md
 └── LICENSE
 ```

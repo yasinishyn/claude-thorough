@@ -4,7 +4,7 @@ description: >-
   Presents unclear requirements as interactive multiple-choice questions using
   the AskUserQuestion tool. Call this after identifying unclear axes during
   requirements triage. Pass unclear axes as arguments.
-user-invocable: true
+user-invocable: false
 allowed-tools: AskUserQuestion
 argument-hint: "[list of unclear topics to ask about]"
 ---
