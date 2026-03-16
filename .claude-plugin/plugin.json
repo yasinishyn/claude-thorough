@@ -1,0 +1,10 @@
+{
+  "name": "thorough",
+  "description": "Forces Claude to interrogate vague coding requests before writing any code",
+  "version": "1.0.0",
+  "author": {
+    "name": "yasinishyn"
+  },
+  "repository": "https://github.com/yasinishyn/claude-thorough",
+  "license": "MIT"
+}

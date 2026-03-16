@@ -1,0 +1,14 @@
+{
+  "name": "yasinishyn-claude-thorough",
+  "owner": {
+    "name": "yasinishyn"
+  },
+  "plugins": [
+    {
+      "name": "thorough",
+      "source": ".",
+      "description": "Forces Claude to interrogate vague coding requests before writing any code",
+      "version": "1.0.0"
+    }
+  ]
+}

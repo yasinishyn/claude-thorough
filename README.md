@@ -51,28 +51,33 @@ Writes tests first with mutation-resistant assertions (specific values, boundary
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and working
 
-### Option A — Personal install (available in all your projects)
+### Option A — Plugin install (recommended)
 
-```bash
-mkdir -p ~/.claude/skills/thorough
-cp SKILL.md ~/.claude/skills/thorough/SKILL.md
+Add the marketplace and install the plugin from within Claude Code:
+
+```
+/plugin marketplace add yasinishyn/claude-thorough
+/plugin install thorough@yasinishyn-claude-thorough
 ```
 
-### Option B — Project install (shared with collaborators via git)
+This installs the skill as `/thorough:thorough`.
+
+### Option B — Personal install (available in all your projects)
 
 ```bash
+git clone https://github.com/yasinishyn/claude-thorough.git /tmp/thorough
+mkdir -p ~/.claude/skills/thorough
+cp /tmp/thorough/skills/thorough/SKILL.md ~/.claude/skills/thorough/SKILL.md
+```
+
+### Option C — Project install (shared with collaborators via git)
+
+```bash
+git clone https://github.com/yasinishyn/claude-thorough.git /tmp/thorough
 mkdir -p .claude/skills/thorough
-cp SKILL.md .claude/skills/thorough/SKILL.md
+cp /tmp/thorough/skills/thorough/SKILL.md .claude/skills/thorough/SKILL.md
 git add .claude/skills/thorough/SKILL.md
 git commit -m "Add thorough skill"
-```
-
-### Option C — Clone and install
-
-```bash
-git clone <repo-url> /tmp/thorough
-mkdir -p ~/.claude/skills/thorough
-cp /tmp/thorough/SKILL.md ~/.claude/skills/thorough/SKILL.md
 ```
 
 ### Verify installation
@@ -139,9 +144,15 @@ The skill automatically skips interrogation (but still states its interpretation
 ## File structure
 
 ```
-thorough/
-├── SKILL.md    # The skill itself — all instructions, no code
-└── README.md   # This file
+claude-thorough/
+├── .claude-plugin/
+│   └── plugin.json       # Plugin manifest
+├── skills/
+│   └── thorough/
+│       └── SKILL.md      # The skill itself — all instructions, no code
+├── marketplace.json      # Marketplace manifest for plugin distribution
+├── README.md             # This file
+└── LICENSE
 ```
 
 ## License
