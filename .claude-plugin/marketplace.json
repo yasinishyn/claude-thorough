@@ -6,7 +6,10 @@
   "plugins": [
     {
       "name": "thorough",
-      "source": ".",
+      "source": {
+        "source": "github",
+        "repo": "yasinishyn/claude-thorough"
+      },
       "description": "Forces Claude to interrogate vague coding requests before writing any code",
       "version": "1.0.0"
     }
