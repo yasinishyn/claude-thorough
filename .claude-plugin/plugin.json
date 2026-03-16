@@ -1,7 +1,7 @@
 {
   "name": "thorough",
-  "description": "Forces Claude to interrogate vague coding requests before writing any code",
-  "version": "1.0.0",
+  "description": "Requirements-first development: /plan for deep requirements, /code for TDD implementation, /ask for interactive questions",
+  "version": "2.0.0",
   "author": {
     "name": "yasinishyn"
   },
