@@ -12,6 +12,7 @@ description: >-
   assume", or "interrogate the requirements". Supports -f/--force flag for
   immediate best-effort implementation.
 user-invocable: true
+allowed-tools: AskUserQuestion, Read, Grep, Glob, Bash, Edit, Write, Agent
 ---
 
 # Requirements-First Development
@@ -72,15 +73,34 @@ If **any axis is unclear** → Phase 2.
 
 ## Phase 2 — Interrogation
 
-For each unclear axis, you must gather the user's intent. Do this using the `AskUserQuestion` tool, which presents an interactive selection UI.
+Gather the user's intent for each unclear axis by calling the `AskUserQuestion` tool.
 
-Your ONLY action in this phase is to call `AskUserQuestion`. Do not output questions as text. Do not list questions with bullet points or categories. The tool handles all question presentation.
+**Output format for this phase**: Output at most one short sentence (no question marks), then call `AskUserQuestion`. Example of correct output:
 
-Call `AskUserQuestion` with up to 4 questions per call. Each question has 2-4 options with labels and descriptions. The tool automatically includes an "Other" option for free-text. Use `multiSelect: true` when multiple options can apply. Put recommended options first with "(Recommended)" in the label. Use short headers (max 12 chars).
+```
+I need to clarify a few things before building this.
+[calls AskUserQuestion tool with questions array]
+```
 
-After each tool call, re-triage all 6 axes. If gaps remain, call `AskUserQuestion` again. Repeat until all axes are clear.
+Example of WRONG output (never do this):
 
-Do not re-ask answered questions. Do not offer to "just start and refine later." Do not write code to illustrate a point. Do not treat user confidence as a substitute for clarity. Do not interpret silence on error handling as "errors don't matter."
+```
+**Data & Feeds**
+- Is this single-user or multi-user?
+- How should feeds be fetched?
+```
+
+The tool call should contain questions like:
+
+```json
+{"questions": [{"question": "Who will use this?", "header": "Users", "options": [{"label": "Just me (Recommended)", "description": "Single user, no auth needed"}, {"label": "Small team", "description": "A few users, basic auth"}, {"label": "Public", "description": "Open registration, full auth"}], "multiSelect": false}]}
+```
+
+Constraints: 1-4 questions per call, 2-4 options each. Use `multiSelect: true` when multiple options can apply. Put recommended options first with "(Recommended)" in the label. Use short headers (max 12 chars).
+
+After the user responds, re-triage all 6 axes. If gaps remain, call `AskUserQuestion` again. Repeat until all axes are clear.
+
+Do not re-ask answered questions. Do not offer to "just start and refine later." Do not write code to illustrate a point. Do not treat user confidence as a substitute for clarity.
 
 ---
 
