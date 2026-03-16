@@ -19,6 +19,17 @@ allowed-tools: AskUserQuestion, Read, Grep, Glob, Bash, Edit, Write, Agent
 
 **Core principle**: Writing code before requirements are clear is a form of waste. A few minutes of interrogation prevents hours of rework.
 
+## Phase Checklist — you MUST complete every phase in order
+
+1. **Phase 1 — Triage**: Assess all 6 axes silently
+2. **Phase 2 — Interrogation**: Use `/thorough:ask` to resolve unclear axes. Re-triage after each round. Repeat until ALL axes are clear.
+3. **Phase 2.5 — Feasibility**: Check for technical risks and blockers
+4. **Phase 3 — Codebase Exploration**: Search existing code for patterns and conventions (skip if new project)
+5. **Phase 4 — Requirements Confirmation**: Present full spec, get explicit user approval
+6. **Phase 5 — Implementation**: Tests first, then minimal code
+
+Do NOT stop after Phase 2. Do NOT skip to implementation. Complete every phase.
+
 ---
 
 ## Force Flag
@@ -83,15 +94,26 @@ Unclear axes: stack, users/auth, newsletter format, delivery method, database, s
 /thorough:ask stack, users/auth, newsletter format, delivery method, database, scope
 ```
 
-The `ask` skill will present interactive multiple-choice selections to the user. After it completes, re-triage all 6 axes. If gaps remain, invoke `/thorough:ask` again with the remaining unclear topics.
+### After `ask` returns — mandatory re-triage
+
+When the `ask` skill completes, you MUST re-evaluate all 6 axes against the user's answers. Check each axis explicitly:
+
+1. **Inputs** — Do we know all data sources, formats, and required fields? (e.g., RSS feed URL format, fetch frequency, OPML import)
+2. **Outputs** — Do we know exactly what is produced? (e.g., newsletter format, content structure, styling)
+3. **Behavior** — Do we know what happens on errors and edge cases? (e.g., dead feeds, malformed RSS, duplicate articles, empty feeds)
+4. **Scope** — Is the boundary clear? (e.g., what's in v1 vs later)
+5. **Constraints** — Are all technical decisions made? (e.g., libraries, APIs, deployment)
+6. **Success** — Can we write a concrete acceptance test? (e.g., "user adds 3 feeds, selects 5 articles, clicks generate, sees formatted newsletter")
+
+If ANY axis still has gaps, invoke `/thorough:ask` again with the remaining unclear topics. Do not proceed to Phase 2.5 until all 6 axes are fully resolved.
 
 Do not ask questions as text. Do not re-ask answered questions. Do not offer to "just start and refine later."
 
 ---
 
-## Phase 2.5 — Feasibility Check
+## Phase 2.5 — Feasibility Check (MANDATORY — do not skip)
 
-Before confirming requirements, check whether the described system is actually buildable as specified. Evaluate:
+Once all 6 axes are clear, you MUST proceed to this phase. Do not stop after the interrogation summary. Check whether the described system is actually buildable as specified. Evaluate:
 
 | Concern | Example |
 |---|---|
@@ -124,9 +146,9 @@ Do not proceed until each concern is resolved or explicitly accepted by the user
 
 ---
 
-## Phase 3 — Codebase Exploration
+## Phase 3 — Codebase Exploration (MANDATORY — do not skip)
 
-Before writing requirements or code, build a verified mental model of the existing system. This phase is mandatory whenever a codebase exists.
+After feasibility is confirmed, proceed here. Before writing requirements or code, build a verified mental model of the existing system. This phase is mandatory whenever a codebase exists. If starting a new project with no existing codebase, skip to Phase 4.
 
 ### 3.1 — Search for existing patterns
 
@@ -160,9 +182,9 @@ List:
 
 ---
 
-## Phase 4 — Requirements Confirmation
+## Phase 4 — Requirements Confirmation (MANDATORY — do not skip)
 
-Write a plain-language bullet-point summary covering:
+After codebase exploration (or directly after feasibility if no codebase exists), write a plain-language bullet-point summary covering:
 
 - What will be built (Inputs → Outputs)
 - Behavior on errors and edge cases
@@ -180,7 +202,7 @@ Only proceed after explicit user confirmation.
 
 ---
 
-## Phase 5 — Implementation
+## Phase 5 — Implementation (only after Phase 4 confirmation)
 
 ### 5.1 — Tests first
 
