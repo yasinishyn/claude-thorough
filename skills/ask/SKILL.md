@@ -18,8 +18,8 @@ You have been given a list of unclear topics. Your job is to call the `AskUserQu
 1. Read the arguments passed to this skill. They describe what needs to be clarified.
 2. Convert each unclear topic into a question with 2-4 concrete options.
 3. Call `AskUserQuestion` with up to 4 questions.
-4. After the user responds, check if anything is still unclear. If yes, call `AskUserQuestion` again.
-5. When everything is clear, output a summary of all decisions made.
+4. After the user responds, check if any of the passed topics are still unclear. If yes, call `AskUserQuestion` again.
+5. When all passed topics have answers, output ONLY the raw answers as a simple key: value list. Do NOT output a formatted summary table. Do NOT say "here's a summary" or treat this as a final deliverable. The calling skill will continue processing after you finish.
 
 ## Formatting rules
 

@@ -96,16 +96,20 @@ Unclear axes: stack, users/auth, newsletter format, delivery method, database, s
 
 ### After `ask` returns — mandatory re-triage
 
-When the `ask` skill completes, you MUST re-evaluate all 6 axes against the user's answers. Check each axis explicitly:
+When the `ask` skill completes, you MUST immediately (in the same response) do the following:
 
-1. **Inputs** — Do we know all data sources, formats, and required fields? (e.g., RSS feed URL format, fetch frequency, OPML import)
-2. **Outputs** — Do we know exactly what is produced? (e.g., newsletter format, content structure, styling)
-3. **Behavior** — Do we know what happens on errors and edge cases? (e.g., dead feeds, malformed RSS, duplicate articles, empty feeds)
-4. **Scope** — Is the boundary clear? (e.g., what's in v1 vs later)
-5. **Constraints** — Are all technical decisions made? (e.g., libraries, APIs, deployment)
-6. **Success** — Can we write a concrete acceptance test? (e.g., "user adds 3 feeds, selects 5 articles, clicks generate, sees formatted newsletter")
+1. **Output "Re-triaging all 6 axes..."** as a heading
+2. **Check each axis explicitly** and mark it clear or unclear:
+   - **Inputs** — Do we know all data sources, formats, and required fields?
+   - **Outputs** — Do we know exactly what is produced and in what format?
+   - **Behavior** — Do we know what happens on errors and edge cases?
+   - **Scope** — Is the boundary clear?
+   - **Constraints** — Are all technical decisions made?
+   - **Success** — Can we write a concrete acceptance test?
+3. If ANY axis still has gaps, invoke `/thorough:ask` again with the remaining unclear topics.
+4. If ALL axes are clear, output "All axes resolved. Proceeding to Phase 2.5 — Feasibility Check." and continue IMMEDIATELY to Phase 2.5 in the same response.
 
-If ANY axis still has gaps, invoke `/thorough:ask` again with the remaining unclear topics. Do not proceed to Phase 2.5 until all 6 axes are fully resolved.
+**Do NOT stop here. Do NOT wait for user input. Proceed to Phase 2.5 immediately.**
 
 Do not ask questions as text. Do not re-ask answered questions. Do not offer to "just start and refine later."
 
@@ -143,6 +147,8 @@ If any concern exists, surface it before proceeding:
 ```
 
 Do not proceed until each concern is resolved or explicitly accepted by the user.
+
+If no feasibility concerns exist, output "No feasibility concerns. Proceeding to Phase 3." and continue immediately.
 
 ---
 
