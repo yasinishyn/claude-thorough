@@ -70,36 +70,59 @@ If **any axis is unclear** → Phase 2.
 
 ---
 
-## Phase 2 — Interrogation
+## Phase 2 — Interrogation (Interactive)
 
-Ask every question needed to resolve all unclear axes. **No cap on number of questions. No cap on number of rounds.** Stay in this phase — cycling back after each user response — until every axis is unambiguously clear.
+Use the **AskUserQuestion** tool to present unclear axes as interactive multiple-choice selections. This replaces open-ended text questions with clickable options the user can quickly select from.
 
-After each user response, re-triage all 6 axes. New answers often reveal new gaps. Ask those too. Do not leave this phase until the full picture is solid.
+### How to use AskUserQuestion
 
-### Format each round as:
+The tool supports **1-4 questions per call**, each with **2-4 options**. Users can always select "Other" to provide free-text input (this is built into the tool automatically). Use multiple rounds if there are more than 4 unclear axes.
 
-```
-## Requirements aren't clear yet
+### Structuring each round
 
-[1-2 sentences: what is still underspecified and why it matters for implementation.]
+1. **Prioritize**: Identify the 4 most impactful unclear axes for this round. Start with questions whose answers will inform subsequent questions.
+2. **Design options**: For each question, provide 2-4 concrete options that represent the most likely answers. Put the recommended option first with "(Recommended)" in the label.
+3. **Write clear descriptions**: Each option's description should explain what choosing it means for the implementation — tradeoffs, implications, what changes.
+4. **Use headers**: Keep headers short (max 12 chars) — e.g., "Stack", "Auth", "Database", "Scope", "Delivery", "Format".
 
-**[Category name]**
-- [Question]
-- [Question]
+### Example AskUserQuestion call
 
-**[Category name]**
-- [Question]
+```json
+{
+  "questions": [
+    {
+      "question": "What tech stack should we use?",
+      "header": "Stack",
+      "options": [
+        { "label": "Next.js (Recommended)", "description": "Full-stack React framework with API routes, SSR, and easy deployment to Vercel" },
+        { "label": "SvelteKit", "description": "Lightweight full-stack framework, smaller bundle size, less ecosystem" },
+        { "label": "Express + React", "description": "Separate backend/frontend, more flexibility, more setup" }
+      ],
+      "multiSelect": false
+    },
+    {
+      "question": "Who will use this?",
+      "header": "Users",
+      "options": [
+        { "label": "Just me (Recommended)", "description": "Single user, no auth needed, simpler architecture" },
+        { "label": "Small team", "description": "A few known users, basic auth with invite codes or shared login" },
+        { "label": "Public", "description": "Open registration, full auth system, abuse prevention" }
+      ],
+      "multiSelect": false
+    }
+  ]
+}
 ```
 
 ### Rules
 
-- Batch all questions for the round — never drip-feed one at a time.
-- Group questions by category (may or may not align with the 6 axes).
-- Be direct. No apologies, no hedging.
+- **Use AskUserQuestion for every interrogation round.** Do not fall back to open-ended text questions unless the question genuinely cannot be expressed as multiple choice (rare).
+- Present a brief 1-2 sentence summary of what's still unclear BEFORE the AskUserQuestion call, so the user has context.
+- After each round of answers, re-triage all 6 axes. New answers often reveal new gaps — ask those in the next round.
+- **No cap on number of rounds.** Stay in this phase until every axis is unambiguously clear.
 - Never re-ask a question the user already answered.
 - Flag contradictions immediately: quote both conflicting statements and ask which one holds.
-- After each user response, re-triage all 6 axes. If new answers reveal new gaps, ask about those too.
-- Stay in this phase until every axis is unambiguous.
+- Use `multiSelect: true` when choices are not mutually exclusive (e.g., "Which features do you want?" where multiple can apply).
 - Do NOT offer to "just start" and refine later — that's how you get 400-line rewrites.
 
 ### Anti-pattern enforcement
@@ -109,6 +132,7 @@ After each user response, re-triage all 6 axes. New answers often reveal new gap
 - Do NOT interpret silence on error handling as "errors don't matter."
 - Do NOT treat a half-answered question as resolved.
 - Do NOT assume to simplify the scope. Under-scoping is just as dangerous as over-scoping — delivering less than what's needed wastes just as much time as delivering more.
+- Do NOT fall back to plain text questions out of laziness — always use AskUserQuestion when options can be enumerated.
 
 ---
 
