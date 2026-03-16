@@ -72,67 +72,48 @@ If **any axis is unclear** → Phase 2.
 
 ## Phase 2 — Interrogation (Interactive)
 
-Use the **AskUserQuestion** tool to present unclear axes as interactive multiple-choice selections. This replaces open-ended text questions with clickable options the user can quickly select from.
+**MANDATORY: You MUST call the `AskUserQuestion` tool for ALL interrogation questions. NEVER write questions as plain text output. If you catch yourself typing questions as text, STOP and use the tool instead.**
 
-### How to use AskUserQuestion
+The AskUserQuestion tool presents interactive multiple-choice UI that users can click to answer. This is the ONLY acceptable way to ask questions in this phase.
 
-The tool supports **1-4 questions per call**, each with **2-4 options**. Users can always select "Other" to provide free-text input (this is built into the tool automatically). Use multiple rounds if there are more than 4 unclear axes.
+### Tool constraints
 
-### Structuring each round
+- **1-4 questions per tool call**, each with **2-4 options**
+- Users can always select "Other" for free-text input (built into the tool automatically)
+- Use multiple rounds (multiple tool calls) if there are more than 4 unclear axes
+- Set `multiSelect: true` when choices are not mutually exclusive
 
-1. **Prioritize**: Identify the 4 most impactful unclear axes for this round. Start with questions whose answers will inform subsequent questions.
-2. **Design options**: For each question, provide 2-4 concrete options that represent the most likely answers. Put the recommended option first with "(Recommended)" in the label.
-3. **Write clear descriptions**: Each option's description should explain what choosing it means for the implementation — tradeoffs, implications, what changes.
-4. **Use headers**: Keep headers short (max 12 chars) — e.g., "Stack", "Auth", "Database", "Scope", "Delivery", "Format".
+### Before calling the tool
 
-### Example AskUserQuestion call
+Output a brief 1-2 sentence context line explaining what's still unclear and why it matters. Then IMMEDIATELY call AskUserQuestion. Do not list questions as text.
 
-```json
-{
-  "questions": [
-    {
-      "question": "What tech stack should we use?",
-      "header": "Stack",
-      "options": [
-        { "label": "Next.js (Recommended)", "description": "Full-stack React framework with API routes, SSR, and easy deployment to Vercel" },
-        { "label": "SvelteKit", "description": "Lightweight full-stack framework, smaller bundle size, less ecosystem" },
-        { "label": "Express + React", "description": "Separate backend/frontend, more flexibility, more setup" }
-      ],
-      "multiSelect": false
-    },
-    {
-      "question": "Who will use this?",
-      "header": "Users",
-      "options": [
-        { "label": "Just me (Recommended)", "description": "Single user, no auth needed, simpler architecture" },
-        { "label": "Small team", "description": "A few known users, basic auth with invite codes or shared login" },
-        { "label": "Public", "description": "Open registration, full auth system, abuse prevention" }
-      ],
-      "multiSelect": false
-    }
-  ]
-}
-```
+### How to structure questions
+
+1. **Prioritize**: Pick the 4 most impactful unclear axes for this round. Start with questions whose answers inform subsequent questions.
+2. **Design options**: Provide 2-4 concrete options representing the most likely answers. Put the recommended option first with "(Recommended)" in the label.
+3. **Write descriptions**: Each option's description should explain implementation implications — tradeoffs, what changes.
+4. **Use short headers** (max 12 chars): "Stack", "Auth", "Database", "Scope", "Delivery", "Format", "Users", "Output", etc.
+
+### After each round
+
+Re-triage all 6 axes. If new gaps emerged, call AskUserQuestion again for the next round. Continue until every axis is unambiguously clear.
 
 ### Rules
 
-- **Use AskUserQuestion for every interrogation round.** Do not fall back to open-ended text questions unless the question genuinely cannot be expressed as multiple choice (rare).
-- Present a brief 1-2 sentence summary of what's still unclear BEFORE the AskUserQuestion call, so the user has context.
-- After each round of answers, re-triage all 6 axes. New answers often reveal new gaps — ask those in the next round.
-- **No cap on number of rounds.** Stay in this phase until every axis is unambiguously clear.
+- **NEVER output questions as plain text.** Always use the AskUserQuestion tool.
 - Never re-ask a question the user already answered.
-- Flag contradictions immediately: quote both conflicting statements and ask which one holds.
-- Use `multiSelect: true` when choices are not mutually exclusive (e.g., "Which features do you want?" where multiple can apply).
+- Flag contradictions immediately: quote both conflicting statements and use AskUserQuestion to ask which one holds.
+- No cap on number of rounds. Stay in this phase until every axis is unambiguous.
 - Do NOT offer to "just start" and refine later — that's how you get 400-line rewrites.
 
 ### Anti-pattern enforcement
 
+- Do NOT write questions as text output — this is the #1 anti-pattern for this phase. USE THE TOOL.
 - Do NOT write code "to show what I mean" — use words.
 - Do NOT treat user confidence as a substitute for clarity ("I know what I want" does not resolve the Behavior axis).
 - Do NOT interpret silence on error handling as "errors don't matter."
 - Do NOT treat a half-answered question as resolved.
 - Do NOT assume to simplify the scope. Under-scoping is just as dangerous as over-scoping — delivering less than what's needed wastes just as much time as delivering more.
-- Do NOT fall back to plain text questions out of laziness — always use AskUserQuestion when options can be enumerated.
 
 ---
 
