@@ -2,15 +2,17 @@
 name: thorough
 description: >-
   Forces Claude to interrogate vague coding requests before writing any code.
-  Use this skill whenever the user asks Claude to build, create, write,
-  implement, code, script, refactor, integrate, or generate any software —
-  new features, scripts, APIs, components, refactors, integrations, CLI tools,
-  or full applications. Trigger even if the request seems clear on the surface —
-  most coding prompts are underspecified in ways that become painful later. Do
-  NOT skip this skill just because the user sounds confident or impatient.
-  Also triggers on "/thorough", "be thorough", "think it through", "don't
-  assume", or "interrogate the requirements". Supports -f/--force flag for
-  immediate best-effort implementation.
+  IMPORTANT: When asking clarifying questions, you MUST use the AskUserQuestion
+  tool to present interactive multiple-choice selections. NEVER write questions
+  as plain text output. Use this skill whenever the user asks Claude to build,
+  create, write, implement, code, script, refactor, integrate, or generate any
+  software — new features, scripts, APIs, components, refactors, integrations,
+  CLI tools, or full applications. Trigger even if the request seems clear on
+  the surface — most coding prompts are underspecified in ways that become
+  painful later. Do NOT skip this skill just because the user sounds confident
+  or impatient. Also triggers on "/thorough", "be thorough", "think it through",
+  "don't assume", or "interrogate the requirements". Supports -f/--force flag
+  for immediate best-effort implementation.
 user-invocable: true
 allowed-tools: AskUserQuestion, Read, Grep, Glob, Bash, Edit, Write, Agent
 ---
