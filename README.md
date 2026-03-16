@@ -1,6 +1,6 @@
 # thorough
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin for requirements-first development. No more "I made some assumptions" — every request goes through deep requirements gathering with user stories, user flows, data modeling, and explicit confirmation before a single line is generated.
+A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin for requirements-first development. Separates project requirements, feature planning, and implementation into distinct phases — so Claude asks the right questions before writing any code.
 
 Questions are presented as **interactive multiple-choice selections** — no walls of text to read and respond to.
 
@@ -8,42 +8,42 @@ Questions are presented as **interactive multiple-choice selections** — no wal
 
 Claude is eager to help. Sometimes too eager. Given a vague prompt like "build me an API," it will pick a framework, invent a schema, guess at auth, and hand you 200 lines of code built on assumptions you never agreed to.
 
-`thorough` fixes this with two commands that separate **planning** from **coding**:
+`thorough` fixes this with three commands:
 
-- **`/thorough:plan`** — Deep requirements gathering across 12 axes: user roles, user stories, user flows, data model, UI/UX, inputs, outputs, behavior, scope, constraints, integrations, and success criteria. Produces a structured requirements document.
-- **`/thorough:code`** — TDD implementation of the approved plan. Strict Red-Green methodology: failing tests first, then minimal code.
+| Command | Purpose |
+|---|---|
+| **`/thorough:sketch`** | Create a full project requirements document |
+| **`/thorough:plan`** | Plan a specific feature for implementation |
+| **`/thorough:code`** | TDD implementation of a planned feature |
 
 ## How it works
 
-### `/thorough:plan` — 5 phases
+### `/thorough:sketch` — Project requirements
 
-#### Phase 1 — Triage
-Silently evaluates your request against 12 axes (not just the usual 6). Covers user roles, user stories, user flows, data model, UI/UX, and more.
+Creates a comprehensive requirements document (`REQUIREMENTS.md`) tailored to your specific project. Unlike fixed templates, it:
 
-#### Phase 2 — Interrogation
-Presents interactive multiple-choice questions in priority rounds:
-1. **Who and What** — roles, core user stories, MVP scope
-2. **How It Works** — user flows, data model, UI/UX
-3. **Technical Decisions** — stack, database, integrations, deployment
-4. **Edge Cases** — errors, empty states, validation, success criteria
+1. **Analyzes your request** to determine what kind of software you're building (web app, CLI, API, library, etc.)
+2. **Generates project-specific categories** — a web app gets Pages & Navigation; a CLI gets Commands & Flags; an API gets Endpoints & Auth. No irrelevant sections.
+3. **Asks targeted questions** through interactive multiple-choice, in priority rounds
+4. **Checks feasibility** before committing to the spec
+5. **Writes a structured requirements document** with user stories, data model, scope boundaries, and acceptance tests
 
-Re-triages after every round until all 12 axes are clear.
+### `/thorough:plan` — Feature planning
 
-#### Phase 3 — Feasibility
-Checks for technical blockers, scope mismatches, dependency risks. Verifies external APIs actually exist.
+Plans a specific feature or user story from the requirements document:
 
-#### Phase 4 — Codebase Exploration
-Searches existing code for patterns and conventions. Skipped for new projects.
-
-#### Phase 5 — Requirements Document
-Structured spec with: user roles, user stories, user flows, data model, pages/screens, technical spec, scope boundaries, and acceptance tests. Waits for explicit approval before any code is written.
+1. **Reads `REQUIREMENTS.md`** and extracts everything relevant to the feature
+2. **Clarifies feature-specific details** that the requirements doc left open
+3. **Explores the codebase** for patterns, conventions, and related implementations
+4. **Produces an implementation plan** with file list, build order, test plan, and edge cases
 
 ### `/thorough:code` — TDD implementation
 
-After the plan is approved:
+Implements the planned feature using strict Test-Driven Development:
+
 1. Breaks the plan into implementable units ordered by dependency
 2. For each unit: write failing tests → run → write minimal code → run → refactor
-3. Verifies against success criteria from the plan
+3. Verifies against acceptance criteria from the plan
 4. Stops and asks if anything becomes unclear mid-implementation
 
 ## Install
@@ -64,18 +64,20 @@ After the plan is approved:
 
 ```bash
 git clone https://github.com/yasinishyn/claude-thorough.git /tmp/thorough
-mkdir -p ~/.claude/skills/plan ~/.claude/skills/code
+mkdir -p ~/.claude/skills/sketch ~/.claude/skills/plan ~/.claude/skills/code
+cp /tmp/thorough/skills/sketch/SKILL.md ~/.claude/skills/sketch/SKILL.md
 cp /tmp/thorough/skills/plan/SKILL.md ~/.claude/skills/plan/SKILL.md
 cp /tmp/thorough/skills/code/SKILL.md ~/.claude/skills/code/SKILL.md
 ```
 
-With this method skills are invoked as `/plan` and `/code` (no namespace prefix).
+With this method skills are invoked as `/sketch`, `/plan`, `/code` (no namespace prefix).
 
 ### Option C — Project install (shared with collaborators via git)
 
 ```bash
 git clone https://github.com/yasinishyn/claude-thorough.git /tmp/thorough
-mkdir -p .claude/skills/plan .claude/skills/code
+mkdir -p .claude/skills/sketch .claude/skills/plan .claude/skills/code
+cp /tmp/thorough/skills/sketch/SKILL.md .claude/skills/sketch/SKILL.md
 cp /tmp/thorough/skills/plan/SKILL.md .claude/skills/plan/SKILL.md
 cp /tmp/thorough/skills/code/SKILL.md .claude/skills/code/SKILL.md
 git add .claude/skills/
@@ -87,56 +89,53 @@ git commit -m "Add thorough skills"
 Start a new Claude Code session and run:
 
 ```
-/thorough:plan build me a website
+/thorough:sketch build me a website
 ```
 
-If installed correctly, Claude will triage the request and present interactive questions instead of writing code.
+If installed correctly, Claude will analyze your request and present interactive questions instead of writing code.
 
 ## Usage
 
 ### Typical workflow
 
 ```
-# Step 1: Plan
-/thorough:plan build me a website where I can add RSS feeds and it generates a newsletter
+# Step 1: Define the project
+/thorough:sketch build me a website where I can add RSS feeds and it generates a newsletter
 
 # (Answer interactive questions across multiple rounds)
-# (Review and approve the requirements document)
+# (Review REQUIREMENTS.md — edit if needed)
 
-# Step 2: Implement
+# Step 2: Plan a feature
+/thorough:plan add RSS feed management
+
+# (Review the implementation plan)
+
+# Step 3: Implement
 /thorough:code
+
+# Step 4: Plan the next feature
+/thorough:plan generate newsletter from articles
+
+# ...and so on
 ```
 
 ### Force flag (skip all phases)
 
 ```
-/thorough:plan -f parse this CSV and dump it to JSON
+/thorough:sketch -f parse this CSV and dump it to JSON
 ```
 
-Skips all phases, states assumptions upfront, and writes code immediately.
+Skips all phases, states assumptions upfront, and writes the document immediately.
 
 ### Natural language triggers
 
-These phrases also activate `/thorough:plan`:
+These phrases also activate `/thorough:sketch`:
 
 - "be thorough"
 - "think it through"
 - "don't assume"
 - "plan this out"
 - "interrogate the requirements"
-
-## What it asks that others don't
-
-| Axis | Example questions |
-|---|---|
-| **User Roles** | Who uses this? Admin vs end user? Permissions? |
-| **User Stories** | As a [role], I want [action], so that [outcome] |
-| **User Flows** | Step-by-step: what does the user see, click, experience? |
-| **Data Model** | What entities? Relationships? Required fields? |
-| **UI/UX** | What pages? Navigation? Responsive? Design style? |
-| **Error Handling** | Dead feeds? Malformed data? Network failures? |
-| **Empty States** | What does the user see when there's no data yet? |
-| **Scope** | What's in v1? What's explicitly out? |
 
 ## File structure
 
@@ -146,8 +145,10 @@ claude-thorough/
 │   ├── plugin.json          # Plugin manifest
 │   └── marketplace.json     # Marketplace manifest for distribution
 ├── skills/
+│   ├── sketch/
+│   │   └── SKILL.md         # Project requirements document creation
 │   ├── plan/
-│   │   └── SKILL.md         # Requirements gathering — 5 phases
+│   │   └── SKILL.md         # Feature planning
 │   ├── code/
 │   │   └── SKILL.md         # TDD implementation
 │   └── ask/

@@ -1,10 +1,10 @@
 ---
 name: code
 description: >-
-  TDD implementation phase. Use after /thorough:plan has produced an approved
-  requirements document. Follows strict Red-Green methodology: write failing
-  tests first, then minimal code to pass them. Also triggers on
-  "/thorough:code", "start coding", "implement the plan".
+  TDD implementation phase. Use after /thorough:plan has produced a feature
+  plan. Follows strict Red-Green methodology: write failing tests first,
+  then minimal code to pass them. Also triggers on "/thorough:code",
+  "start coding", "implement the plan".
 user-invocable: true
 allowed-tools: AskUserQuestion, Read, Grep, Glob, Bash, Edit, Write, Agent
 argument-hint: "[optional: specific feature or user story to implement]"
@@ -12,11 +12,11 @@ argument-hint: "[optional: specific feature or user story to implement]"
 
 # TDD Implementation
 
-This skill implements an approved requirements document using strict Test-Driven Development.
+This skill implements a feature using strict Test-Driven Development, based on the plan from `/thorough:plan`.
 
 ## Step 1 — Locate the plan
 
-Search the conversation history for the approved requirements document from `/thorough:plan`. If no approved plan exists, tell the user to run `/thorough:plan` first.
+Search the conversation history for the feature plan from `/thorough:plan`. Also read `REQUIREMENTS.md` for project context. If no plan exists, tell the user to run `/thorough:plan [feature]` first.
 
 ## Step 2 — Implementation order
 
