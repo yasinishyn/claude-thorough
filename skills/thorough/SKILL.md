@@ -57,12 +57,12 @@ Before doing anything else, silently assess the request against 6 axes:
 
 | Axis | What must be clear |
 |---|---|
-| **Inputs** | What data comes in? Format, source, required vs optional. |
-| **Outputs** | What is returned/produced/emitted? Format, destination. |
-| **Behavior** | What happens on errors, edge cases? Are there modes or states? |
-| **Scope** | Prototype or production? One-off script or maintained system? |
-| **Constraints** | Language, framework, performance targets, existing codebase conventions. |
-| **Success** | How will the user know it works? What does "done" look like? |
+| **Inputs** | Data format, source, required vs optional fields. |
+| **Outputs** | Return format, destination, structure. |
+| **Behavior** | Error handling, edge cases, modes, states. |
+| **Scope** | Prototype vs production. One-off vs maintained. |
+| **Constraints** | Language, framework, performance, existing conventions. |
+| **Success** | Acceptance criteria. Definition of done. |
 
 If **all 6 axes are clear**, skip to Phase 3 (Codebase Exploration) but first state the interpretation of all 6 axes and get confirmation.
 
@@ -70,46 +70,17 @@ If **any axis is unclear** → Phase 2.
 
 ---
 
-## Phase 2 — Interrogation (Interactive)
+## Phase 2 — Interrogation
 
-### Step-by-step procedure (follow EXACTLY)
+For each unclear axis, you must gather the user's intent. Do this using the `AskUserQuestion` tool, which presents an interactive selection UI.
 
-1. Output ONE sentence: "I need to clarify a few things before building this."
-2. **IMMEDIATELY call the `AskUserQuestion` tool** — do NOT output any questions as text. The tool renders an interactive UI with clickable options.
-3. Wait for the user's selections.
-4. Re-triage all 6 axes. If gaps remain, go back to step 1 with the next batch.
-5. Repeat until all axes are clear.
+Your ONLY action in this phase is to call `AskUserQuestion`. Do not output questions as text. Do not list questions with bullet points or categories. The tool handles all question presentation.
 
-**CRITICAL: Between step 1 and step 2, do NOT output any text that contains question marks. If your output contains "?" you are doing it wrong. All questions go through the tool.**
+Call `AskUserQuestion` with up to 4 questions per call. Each question has 2-4 options with labels and descriptions. The tool automatically includes an "Other" option for free-text. Use `multiSelect: true` when multiple options can apply. Put recommended options first with "(Recommended)" in the label. Use short headers (max 12 chars).
 
-### AskUserQuestion tool format
+After each tool call, re-triage all 6 axes. If gaps remain, call `AskUserQuestion` again. Repeat until all axes are clear.
 
-- 1-4 questions per call, each with 2-4 options
-- Users automatically get an "Other" option for free-text input
-- Use `multiSelect: true` when choices are not mutually exclusive
-- Put the recommended option first with "(Recommended)" in the label
-- Keep `header` short (max 12 chars): "Stack", "Auth", "DB", "Scope", "Delivery", "Format", "Users", "Output"
-- Each option `description` should explain implementation implications
-
-### Prioritization
-
-Pick the 4 most impactful unclear axes per round. Start with questions whose answers inform subsequent questions (e.g., ask about scope before asking about auth).
-
-### Rules
-
-- Never re-ask a question the user already answered.
-- Flag contradictions: quote both conflicting statements and use AskUserQuestion to resolve.
-- No cap on number of rounds.
-- Do NOT offer to "just start" and refine later.
-
-### Anti-patterns (NEVER do these)
-
-- Writing questions as text with "?" in your output — USE THE TOOL
-- Writing code "to show what I mean"
-- Treating user confidence as a substitute for clarity
-- Interpreting silence on error handling as "errors don't matter"
-- Treating a half-answered question as resolved
-- Assuming to simplify scope without agreement
+Do not re-ask answered questions. Do not offer to "just start and refine later." Do not write code to illustrate a point. Do not treat user confidence as a substitute for clarity. Do not interpret silence on error handling as "errors don't matter."
 
 ---
 
@@ -251,20 +222,13 @@ If something new becomes unclear during coding: **stop and ask.** Do not guess, 
 
 ## Examples of Vague Prompts (always interrogate)
 
-- **"Build me a script that processes CSV files"**
-  → Which columns? What processing? Output to file or stdout? What if a row is malformed?
+These prompts are underspecified — use AskUserQuestion to resolve them:
 
-- **"Create a REST API for user management"**
-  → What operations? Auth? What DB? What does "user" consist of? Rate limiting?
-
-- **"Write a function to validate emails"**
-  → What counts as valid? Check DNS? What should it return on failure?
-
-- **"Make a dashboard for our data"**
-  → What data? What questions should it answer? Who's the audience? What stack?
-
-- **"Refactor this to be cleaner"**
-  → What's the pain point? Is behavior changing? Are there tests? What does "cleaner" mean?
+- "Build me a script that processes CSV files" → unclear on columns, processing logic, output format, error handling
+- "Create a REST API for user management" → unclear on operations, auth, database, user schema, rate limiting
+- "Write a function to validate emails" → unclear on validation rules, DNS checking, failure return type
+- "Make a dashboard for our data" → unclear on data source, audience, key metrics, stack
+- "Refactor this to be cleaner" → unclear on pain point, behavior changes, test coverage, definition of clean
 
 ---
 
