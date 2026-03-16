@@ -2,17 +2,15 @@
 name: thorough
 description: >-
   Forces Claude to interrogate vague coding requests before writing any code.
-  IMPORTANT: When asking clarifying questions, you MUST use the AskUserQuestion
-  tool to present interactive multiple-choice selections. NEVER write questions
-  as plain text output. Use this skill whenever the user asks Claude to build,
-  create, write, implement, code, script, refactor, integrate, or generate any
-  software — new features, scripts, APIs, components, refactors, integrations,
-  CLI tools, or full applications. Trigger even if the request seems clear on
-  the surface — most coding prompts are underspecified in ways that become
-  painful later. Do NOT skip this skill just because the user sounds confident
-  or impatient. Also triggers on "/thorough", "be thorough", "think it through",
-  "don't assume", or "interrogate the requirements". Supports -f/--force flag
-  for immediate best-effort implementation.
+  Use this skill whenever the user asks Claude to build, create, write,
+  implement, code, script, refactor, integrate, or generate any software —
+  new features, scripts, APIs, components, refactors, integrations, CLI tools,
+  or full applications. Trigger even if the request seems clear on the surface —
+  most coding prompts are underspecified in ways that become painful later. Do
+  NOT skip this skill just because the user sounds confident or impatient.
+  Also triggers on "/thorough", "be thorough", "think it through", "don't
+  assume", or "interrogate the requirements". Supports -f/--force flag for
+  immediate best-effort implementation.
 user-invocable: true
 allowed-tools: AskUserQuestion, Read, Grep, Glob, Bash, Edit, Write, Agent
 ---
@@ -75,34 +73,19 @@ If **any axis is unclear** → Phase 2.
 
 ## Phase 2 — Interrogation
 
-Gather the user's intent for each unclear axis by calling the `AskUserQuestion` tool.
+After triage, list the unclear axes as a short comma-separated summary, then invoke the `/thorough:ask` skill to gather the user's preferences interactively. Pass the unclear axes as arguments.
 
-**Output format for this phase**: Output at most one short sentence (no question marks), then call `AskUserQuestion`. Example of correct output:
-
-```
-I need to clarify a few things before building this.
-[calls AskUserQuestion tool with questions array]
-```
-
-Example of WRONG output (never do this):
+Example:
 
 ```
-**Data & Feeds**
-- Is this single-user or multi-user?
-- How should feeds be fetched?
+Unclear axes: stack, users/auth, newsletter format, delivery method, database, scope.
+
+/thorough:ask stack, users/auth, newsletter format, delivery method, database, scope
 ```
 
-The tool call should contain questions like:
+The `ask` skill will present interactive multiple-choice selections to the user. After it completes, re-triage all 6 axes. If gaps remain, invoke `/thorough:ask` again with the remaining unclear topics.
 
-```json
-{"questions": [{"question": "Who will use this?", "header": "Users", "options": [{"label": "Just me (Recommended)", "description": "Single user, no auth needed"}, {"label": "Small team", "description": "A few users, basic auth"}, {"label": "Public", "description": "Open registration, full auth"}], "multiSelect": false}]}
-```
-
-Constraints: 1-4 questions per call, 2-4 options each. Use `multiSelect: true` when multiple options can apply. Put recommended options first with "(Recommended)" in the label. Use short headers (max 12 chars).
-
-After the user responds, re-triage all 6 axes. If gaps remain, call `AskUserQuestion` again. Repeat until all axes are clear.
-
-Do not re-ask answered questions. Do not offer to "just start and refine later." Do not write code to illustrate a point. Do not treat user confidence as a substitute for clarity.
+Do not ask questions as text. Do not re-ask answered questions. Do not offer to "just start and refine later."
 
 ---
 
