@@ -1,12 +1,14 @@
 # thorough
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that forces requirements interrogation before any code gets written. No more "I made some assumptions" — every request goes through structured clarification, feasibility checks, codebase exploration, and explicit confirmation before a single line is generated.
+A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin that forces requirements interrogation before any code gets written. No more "I made some assumptions" — every request goes through structured clarification, feasibility checks, codebase exploration, and explicit confirmation before a single line is generated.
+
+Questions are presented as **interactive multiple-choice selections** using Claude Code's AskUserQuestion tool — no more walls of text to read and respond to.
 
 ## Why
 
 Claude is eager to help. Sometimes too eager. Given a vague prompt like "build me an API," it will pick a framework, invent a schema, guess at auth, and hand you 200 lines of code built on assumptions you never agreed to.
 
-`thorough` fixes this by enforcing a 5-phase pipeline that treats ambiguity as a blocker, not a creative opportunity.
+`thorough` fixes this by enforcing a 6-phase pipeline that treats ambiguity as a blocker, not a creative opportunity.
 
 ## How it works
 
@@ -27,21 +29,21 @@ If anything is unclear, it moves to Phase 2 instead of guessing.
 
 ### Phase 2 — Interrogation
 
-Asks every question needed to resolve ambiguity. Multiple rounds if necessary. Questions are batched and grouped by category — no drip-feeding one at a time. Contradictions are flagged immediately.
+Presents interactive multiple-choice questions using Claude Code's `AskUserQuestion` tool. You click to select answers instead of typing paragraphs. Multiple rounds if necessary — re-triages after every response until all 6 axes are clear.
 
-### Phase 2.5 — Feasibility Check
+### Phase 3 — Feasibility
 
-Before confirming the spec, checks for technical impossibility, scope mismatches, dependency risks, and conflicting constraints. Surfaces concerns with concrete alternatives.
+Checks for technical impossibility, scope mismatches, dependency risks, and conflicting constraints. Surfaces concerns with concrete alternatives before proceeding.
 
-### Phase 3 — Codebase Exploration
+### Phase 4 — Codebase Exploration
 
-Searches the existing codebase for patterns, conventions, and related implementations. Verifies that every function, method, and API it plans to reference actually exists. Documents files to modify, conventions to follow, and existing tests that must keep passing.
+Searches the existing codebase for patterns, conventions, and related implementations. Verifies that every function, method, and API it plans to reference actually exists. Documents files to modify, conventions to follow, and existing tests that must keep passing. Skipped for new projects with no existing codebase.
 
-### Phase 4 — Requirements Confirmation
+### Phase 5 — Requirements Confirmation
 
-Presents a plain-language bullet-point spec covering everything discovered in Phases 1-3. Waits for your explicit "yes, go ahead" before proceeding.
+Presents a plain-language bullet-point spec covering everything discovered in Phases 1-4. Waits for your explicit "yes, go ahead" before proceeding.
 
-### Phase 5 — Implementation
+### Phase 6 — Implementation
 
 Writes tests first with mutation-resistant assertions (specific values, boundary conditions, side-effect verification). Then writes the minimum code to pass those tests. If something becomes unclear mid-implementation, stops and asks rather than guessing.
 
@@ -58,9 +60,10 @@ Add the marketplace and install the plugin from within Claude Code:
 ```
 /plugin marketplace add yasinishyn/claude-thorough
 /plugin install thorough@yasinishyn-claude-thorough
+/reload-plugins
 ```
 
-This installs the skill as `/thorough:thorough`.
+The skill is invoked as `/thorough:thorough`. The plugin also includes `/thorough:ask` for standalone interactive questioning.
 
 ### Option B — Personal install (available in all your projects)
 
@@ -69,6 +72,8 @@ git clone https://github.com/yasinishyn/claude-thorough.git /tmp/thorough
 mkdir -p ~/.claude/skills/thorough
 cp /tmp/thorough/skills/thorough/SKILL.md ~/.claude/skills/thorough/SKILL.md
 ```
+
+With this method the skill is invoked as `/thorough` (no namespace prefix).
 
 ### Option C — Project install (shared with collaborators via git)
 
@@ -85,17 +90,17 @@ git commit -m "Add thorough skill"
 Start a new Claude Code session and run:
 
 ```
-/thorough hello
+/thorough:thorough hello
 ```
 
-If installed correctly, Claude will triage the request and start asking questions instead of writing code.
+If installed correctly, Claude will triage the request and present interactive questions instead of writing code.
 
 ## Usage
 
 ### Slash command
 
 ```
-/thorough build an API endpoint for user registration
+/thorough:thorough build an API endpoint for user registration
 ```
 
 ### Natural language triggers
@@ -114,10 +119,18 @@ Example: _"Don't assume anything — I need a caching layer for our API."_
 When you know exactly what you want and don't need interrogation, add `-f` or `--force`:
 
 ```
-/thorough -f parse this CSV and dump it to JSON
+/thorough:thorough -f parse this CSV and dump it to JSON
 ```
 
-This skips all phases, states assumptions upfront, and writes code immediately. It still does a quick codebase scan to respect existing conventions.
+This skips all phases, states assumptions upfront, and writes code immediately.
+
+### Standalone interactive questions
+
+Use the `ask` skill directly to gather preferences on specific topics:
+
+```
+/thorough:ask stack, database, auth method, deployment
+```
 
 ### Skip conditions
 
@@ -132,9 +145,9 @@ The skill automatically skips interrogation (but still states its interpretation
 
 | Anti-pattern | How thorough handles it |
 |---|---|
-| "I made some assumptions…" | Asks instead of assuming |
+| "I made some assumptions..." | Asks instead of assuming |
 | Writing a "basic version" to iterate on | Gets the spec right first |
-| One question per turn | Batches all questions per round |
+| One question per turn | Batches questions as interactive selections |
 | Treating user confidence as clarity | Evaluates the 6 axes regardless |
 | Silence on errors = errors don't matter | Explicitly asks about error handling |
 | Half-answered question = resolved | Re-triages after every response |
@@ -146,12 +159,14 @@ The skill automatically skips interrogation (but still states its interpretation
 ```
 claude-thorough/
 ├── .claude-plugin/
-│   └── plugin.json       # Plugin manifest
+│   ├── plugin.json          # Plugin manifest
+│   └── marketplace.json     # Marketplace manifest for distribution
 ├── skills/
-│   └── thorough/
-│       └── SKILL.md      # The skill itself — all instructions, no code
-├── marketplace.json      # Marketplace manifest for plugin distribution
-├── README.md             # This file
+│   ├── thorough/
+│   │   └── SKILL.md         # Main skill — 6-phase pipeline
+│   └── ask/
+│       └── SKILL.md         # Standalone interactive questioning
+├── README.md
 └── LICENSE
 ```
 
